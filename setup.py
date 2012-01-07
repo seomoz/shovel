@@ -18,10 +18,12 @@ setup(name           = 'shovel',
 	url              = 'http://github.com/seomoz/shovel',
 	author           = 'Dan Lecocq',
 	author_email     = 'dan@seomoz.org',
+    license          = "MIT License",
 	keywords         = 'tasks, shovel, rake',
 	packages         = ['shovel'],
 	scripts          = ['bin/shovel'],
 	classifiers      = [
+        'License :: OSI Approved :: MIT License',
 		'Programming Language :: Python',
 		'Intended Audience :: Developers',
 		'Operating System :: OS Independent'
