@@ -28,7 +28,10 @@ def parse(remaining):
         # If it's been given an argument name, save it and wait for the
         # next argument to be parsed
         if item.startswith('--'):
-            kw = item.strip('-')
+            kw, sep, value = item.strip('-').partition('=')
+            if value:
+                kwargs[kw] = value
+                kw = None
         elif kw != None:
             kwargs[kw] = item
             kw = None
@@ -42,14 +45,21 @@ if clargs.method == 'help':
     shovel.help(*args, **kwargs)
 elif clargs.method:
     # Try to get the first command provided
-    t = shovel.Task.find(clargs.method)
-    if not t:
+    tasks = shovel.Task.find(clargs.method)
+    if not tasks:
         print 'Could not find task "%s"' % clargs.method
         exit(1)
     
+    if len(tasks) > 1:
+        print 'Specifier "%s" matches multiple tasks:' % clargs.method
+        for task in tasks:
+            print '\t%s' % task.fullname
+        exit(2)
+    
+    task = tasks[0]
     if clargs.dryRun:
-        t.dry(*args, **kwargs)
+        task.dry(*args, **kwargs)
     else:
-        t(*args, **kwargs)
+        task(*args, **kwargs)
 else:
     print 'Help'

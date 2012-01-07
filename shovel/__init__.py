@@ -7,7 +7,7 @@ import inspect
 logger = logging.getLogger('shovel')
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(message)s')
+formatter = logging.Formatter('[%(levelname)s] %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -94,25 +94,35 @@ class Args(object):
 # First things first, we should have something that encapsulates a task
 class Task(object):
     @classmethod
-    def all(cls, base=_tasks):
-        tasks = []
-        toprocess = [base]
-        while len(toprocess):
-            next = toprocess.pop(0)
-            for key, value in next.items():
-                if isinstance(value, dict):
-                    toprocess.append(value)
-                else:
-                    tasks.append(value)
-        return tasks
-    
-    @classmethod
-    def find(cls, fullname):
+    def find(cls, fullname=''):
         mods = fullname.split('.')
         tasks = _tasks
         while len(mods) > 1:
-            tasks = tasks.get(mods.pop(0), {})
-        return tasks.get(mods.pop(0), None)
+            mod = mods.pop(0)
+            if mod:
+                tasks = tasks.get(mod, {})
+        
+        mod = mods.pop(0)
+        if mod:
+            remaining = tasks.get(mod, None)
+            if not remaining:
+                return []
+            else:
+                remaining = [remaining]
+        else:
+            remaining = [_tasks]
+        
+        # Alright. Now remaining is a list of dictionaries, or maybe
+        # just a task. We should find all tasks under this module
+        # and then return an array of found tasks
+        found = []
+        while len(remaining):
+            next = remaining.pop(0)
+            if isinstance(next, dict):
+                remaining.extend(next.values())
+            else:
+                found.append(next)
+        return found
     
     @classmethod
     def make(cls, obj):
@@ -120,9 +130,9 @@ class Task(object):
             t = Task(obj)
             previous = Task.find(t.fullname)
             if previous:
-                logger.warn('Task "%s" redefined' % t.name)
-                logger.warn('\tPrevious definition in %s.%s at %i' % (t.module, t.file, t.line))
-                logger.warn('\tNew      definition in %s.%s at %i' % (t.module, t.file, t.line))
+                logger.warn('Task "%s" redefined' % t.fullname)
+                logger.warn('\tPrevious definition in %s at %i' % (previous.file, previous.line))
+                logger.warn('\tNew      definition in %s at %i' % (t.file, t.line))
             
             mods = t.fullname.split('.')
             tasks = _tasks
@@ -196,7 +206,7 @@ class Task(object):
         '''Perform a dry-run of the task'''
         arg = Args(self.spec)
         arg.eval(*args, **kwargs)
-        print '%s%s' % (self.name, repr(arg))
+        print 'Would have executed:\n%s%s' % (self.name, repr(arg))
     
     def help(self):
         # Print the name of the function
@@ -210,7 +220,7 @@ class Task(object):
         
         # Print where we read this function in from
         print '=' * 30
-        print 'From %s.%s on line %i' % (self.module, self.file, self.line)
+        print 'From %s on line %i' % (self.file, self.line)
         
         # And finally how it's invoked
         args = Args(self.spec)
@@ -220,24 +230,22 @@ class Task(object):
 def help(*names):
     '''Display information about the provided task name, or available tasks'''
     if not len(names):
-        for task in Task.all():
+        for task in Task.find():
             if len(task.doc) > 50:
-                print '%30s => %47s...' % (task.fullname, task.doc[0:47])
+                print '%30s => %s...' % (task.fullname, task.doc[0:47])
             else:
-                print '%30s => %50s' % (task.fullname, task.doc)
+                print '%30s => %s' % (task.fullname, task.doc)
     else:
         for name in names:
-            t = Task.find(name)
-            if t == None:
+            tasks = Task.find(name)
+            if not tasks:
                 print 'Could not find task or module "%s"' % name
-            elif isinstance(t, dict):
-                for task in Task.all(t):
-                    if len(task.doc) > 50:
-                        print '%30s => %47s...' % (task.fullname, task.doc[0:47])
-                    else:
-                        print '%30s => %50s' % (task.fullname, task.doc)
             else:
-                t.help()
+                for task in tasks:
+                    if len(task.doc) > 50:
+                        print '%30s => %s...' % (task.fullname, task.doc[0:47])
+                    else:
+                        print '%30s => %s' % (task.fullname, task.doc)
 
 def load():
     '''Load tasks from files'''
@@ -253,7 +261,7 @@ def load():
             if root not in sys.path:
                 sys.path.append(root)
             for name in [f for f in files if re.match(r'.+\.py$', f)]:
-                print 'Found python file %s' % os.path.join(root, name)
+                logger.info('Found python file %s' % os.path.join(root, name))
                 #name, sep, ext = name.rpartition('.py')
                 p = os.path.join(root, name)
                 with file(p) as f:
