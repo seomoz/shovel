@@ -1,0 +1,5 @@
+build/*
+dist/*
+shovel.egg-info/*
+*.pyc
+
