@@ -261,6 +261,8 @@ def help(*names):
             tasks = Task.find(name)
             if not tasks:
                 print 'Could not find task or module "%s"' % name
+            elif len(tasks) == 1:
+                tasks[0].help()
             else:
                 for task in tasks:
                     if len(task.doc) > 50:
