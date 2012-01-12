@@ -274,20 +274,16 @@ def load():
     '''Load tasks from files'''
     import re
     import sys
+    import imp
     p = os.path.abspath('./shovel.py')
     if os.path.isfile(p):
         with file(p) as f:
-            code = compile(f.read(), p, 'exec')
-            exec code
+            r = imp.find_module('shovel', ['.'])
+            module = imp.load_module('shovel', r[0], r[1], r[2])
     elif os.path.isdir(os.path.abspath('./shovel')):
         for root, dirs, files in os.walk(os.path.abspath('./shovel')):
-            if root not in sys.path:
-                sys.path.append(root)
             for name in [f for f in files if re.match(r'.+\.py$', f)]:
                 logger.info('Found python file %s' % os.path.join(root, name))
-                #name, sep, ext = name.rpartition('.py')
-                p = os.path.join(root, name)
-                with file(p) as f:
-                    code = compile(f.read(), p, 'exec')
-                    exec code
-
+                name, sep, ext = name.rpartition('.py')
+                r = imp.find_module(name, [root])
+                module = imp.load_module(name, r[0], r[1], r[2])
