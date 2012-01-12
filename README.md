@@ -108,8 +108,3 @@ This can be helpful if you want to inspect the arguments that your task
 would get, to make sure that it's correctly invoked:
 
 	shovel --dry-run foo.bar 1 2 3 --hello 7
-
-Bugs
-----
-
-- Improve namespacing (ensure isolated execution of task, without ns pollution)
