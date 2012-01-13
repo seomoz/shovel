@@ -69,8 +69,6 @@ def parse(remaining):
     if kw:
         kwargs[kw] = True
     
-    print 'Args  : %s' % repr(args)
-    print 'Kwargs: %s' % repr(kwargs)
     return args, kwargs
 
 args, kwargs = parse(remaining)
