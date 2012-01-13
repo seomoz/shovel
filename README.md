@@ -9,8 +9,8 @@ Philosophy of Shovel
 
 - Tasks should be easy to define
 - Making a function a task should change as little as possible
-- Arguments are strings -- we're not going to try to guess
-- Value specificity
+- Arguments are strings -- we're not going to try to guess (there's an exception)
+- We value specificity
 - We'll inspect your tasks as much as we can
 
 Installing Shovel
@@ -108,3 +108,12 @@ This can be helpful if you want to inspect the arguments that your task
 would get, to make sure that it's correctly invoked:
 
 	shovel --dry-run foo.bar 1 2 3 --hello 7
+
+The one exception to arguments not being interpreted as strings is that 
+orphan keyword arguments are interpreted as flags meaning 'True.' For example,
+if we executed the following, then `a` and `b` would be passed as True:
+
+	shovel foo.bar --a --b
+
+The reason for this is that flags are common for tasks, and it's a relatively
+unambiguous syntax. To a human, the meaning is clear, and now it is to shovel.

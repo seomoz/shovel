@@ -90,10 +90,15 @@ class Args(object):
         '''Get a list and a hash that is representative of these args'''
         args  = []
         count = 0
+        # At this point, self.args should be representative of the argument
+        # as they should be supplied to the method
         for pair in self.args:
             if len(pair) < 2:
-                total = len([a for a in self.args if len(a) == 1])
-                raise ValueError('Argument %i not provided. Needs %i more' % (count, total))
+                if pair in self.kwargs:
+                    args.append(self.kwargs.pop(pair))
+                else:
+                    total = len([a for a in self.args if len(a) == 1 and a not in self.kwargs])
+                    raise ValueError('Argument %i not provided. Needs %i more' % (count, total))
             else:
                 count += 1
                 args.append(pair[1])

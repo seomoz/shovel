@@ -49,6 +49,11 @@ def parse(remaining):
         # If it's been given an argument name, save it and wait for the
         # next argument to be parsed
         if item.startswith('--'):
+            # If this item begins with a '--', but there already exists
+            # a keyword argument name, then we should treat that last 
+            # name as a flag for 'True'
+            if kw:
+                kwargs[kw] = True
             kw, sep, value = item.strip('-').partition('=')
             if value:
                 kwargs[kw] = value
@@ -58,6 +63,14 @@ def parse(remaining):
             kw = None
         else:
             args.append(item)
+    
+    # If there's still a keyword argument name, we'll treat is as a
+    # flag to set that option to True.
+    if kw:
+        kwargs[kw] = True
+    
+    print 'Args  : %s' % repr(args)
+    print 'Kwargs: %s' % repr(kwargs)
     return args, kwargs
 
 args, kwargs = parse(remaining)
