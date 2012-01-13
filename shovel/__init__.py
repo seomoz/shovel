@@ -253,14 +253,37 @@ class Task(object):
         print '=' * 30
         print '%s%s' % (self.name, repr(args))
 
+def help_helper(tasks):
+    # This tries to print the reported tasks in a nice, heirarchical fashion
+    modules = []
+    for task in tasks:
+        # Get the module names for the task
+        m = task.fullname.split('.')
+        name = m.pop()
+        # If there are multiple layers here, then we should
+        # print a heirarchical structure.
+        unmatched = []
+        for i in range(len(m)):
+            if i >= len(modules):
+                unmatched = m[i:]
+                break
+            elif modules[i] != m[i]:
+                unmatched = m[i:]
+                modules = modules[:i]
+                break
+        for module in unmatched:
+            print '\t' * len(modules) + module + '/'
+            modules.append(module)
+        
+        if len(task.doc) > 50:
+            print '%30s => %s...' % (task.fullname, task.doc[0:47])
+        else:
+            print '%30s => %s' % (task.fullname, task.doc)
+
 def help(*names):
     '''Display information about the provided task name, or available tasks'''
     if not len(names):
-        for task in Task.find():
-            if len(task.doc) > 50:
-                print '%30s => %s...' % (task.fullname, task.doc[0:47])
-            else:
-                print '%30s => %s' % (task.fullname, task.doc)
+        help_helper(Task.find())
     else:
         for name in names:
             tasks = Task.find(name)
@@ -269,11 +292,7 @@ def help(*names):
             elif len(tasks) == 1:
                 tasks[0].help()
             else:
-                for task in tasks:
-                    if len(task.doc) > 50:
-                        print '%30s => %s...' % (task.fullname, task.doc[0:47])
-                    else:
-                        print '%30s => %s' % (task.fullname, task.doc)
+                help_helper(tasks)
 
 def load():
     '''Load tasks from files'''
