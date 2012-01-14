@@ -94,14 +94,12 @@ class Args(object):
         # as they should be supplied to the method
         for pair in self.args:
             if len(pair) < 2:
-                if pair in self.kwargs:
-                    args.append(self.kwargs.pop(pair))
-                else:
-                    total = len([a for a in self.args if len(a) == 1 and a not in self.kwargs])
-                    raise ValueError('Argument %i not provided. Needs %i more' % (count, total))
+                total = len([a for a in self.args if len(a) == 1])
+                raise ValueError('Argument %i not provided. Needs %i more' % (count, total))
             else:
+                name, value = pair
+                args.append(value)
                 count += 1
-                args.append(pair[1])
         args.extend(self.varargs)
         return (args, self.kwargs)
     
@@ -115,6 +113,12 @@ class Args(object):
                 self.args[i] = (pair[0], args[i])
             else:
                 self.varargs.append(args[i])
+        # For the remaining arguments, if there's a corresponding kwarg,
+        # then we should insert is a positional arg.
+        for i in range(len(args), len(self.args)):
+            name = self.args[i][0]
+            if name in kwargs:
+                self.args[i] = (name, kwargs.pop(name))
         self.kwargs = kwargs
 
 # First things first, we should have something that encapsulates a task
