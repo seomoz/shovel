@@ -22,7 +22,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import argparse
-
+import pkg_resources
 # First off, read the arguments
 parser = argparse.ArgumentParser(description='Rake, for Python')
 
@@ -32,8 +32,12 @@ parser.add_argument('--verbose', dest='verbose', action='store_true',
 parser.add_argument('--dry-run', dest='dryRun', action='store_true',
     help='Don\'t actually run the command, but show the args that would be used')
 
+ver = pkg_resources.require('shovel')[0].version
+parser.add_argument('--version', action='version', version='Shovel v %s' %(ver), help='print the version of Shovel.')
+
 # Parse our arguments
 clargs, remaining = parser.parse_known_args()
+print "remaining %s, %s" % ( clargs, remaining)
 
 import shovel
 import logging
