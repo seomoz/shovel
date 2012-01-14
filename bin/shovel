@@ -37,7 +37,6 @@ parser.add_argument('--version', action='version', version='Shovel v %s' %(ver),
 
 # Parse our arguments
 clargs, remaining = parser.parse_known_args()
-print "remaining %s, %s" % ( clargs, remaining)
 
 import shovel
 import logging
