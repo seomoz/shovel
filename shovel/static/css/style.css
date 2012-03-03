@@ -1,0 +1,45 @@
+body {
+	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+}
+
+.task-container {
+	background-color: whitesmoke;
+	padding-bottom: 10px;
+}
+
+.task-name {
+	font:bold 24px Lucida Grande;
+	background-color: black;
+	color: white;
+	margin-top: 10px;
+	padding: 5px;
+}
+
+.task-file {
+	background-color: black;
+	color: white;
+	font-weight: bold;
+	font-size: 8px;
+	padding-left: 5px;
+	padding-bottom: 10px;
+}
+
+.task-doc {
+	margin-top: 10px;
+	margin-left: 15px;
+}
+
+.task-result {
+	margin-top: 10px;
+	margin-bottom: 5px;
+	margin-left: 15px;
+	font-family: "Courier New", Courier, mono;
+	font-weight: bold;
+}
+
+.task-stdout, .task-stderr, .task-returned, .task-exception {
+	background: lightgrey;
+	margin-top: 10px;
+	font-weight: normal;
+	padding: 10px;
+}

@@ -11,18 +11,21 @@ except ImportError:
 		'dependencies' : ['argparse']
 	}
 
-setup(name           = 'shovel',
-	version          = '0.1.3',
-	description      = 'Not Rake, but Shovel',
-	long_description = 'Execute python functions as tasks',
-	url              = 'http://github.com/seomoz/shovel',
-	author           = 'Dan Lecocq',
-	author_email     = 'dan@seomoz.org',
-    license          = "MIT License",
-	keywords         = 'tasks, shovel, rake',
-	packages         = ['shovel'],
-	scripts          = ['bin/shovel'],
-	classifiers      = [
+setup(name               = 'shovel',
+	version              = '0.1.4',
+	description          = 'Not Rake, but Shovel',
+	long_description     = 'Execute python functions as tasks',
+	url                  = 'http://github.com/seomoz/shovel',
+	author               = 'Dan Lecocq',
+	author_email         = 'dan@seomoz.org',
+    license              = "MIT License",
+	keywords             = 'tasks, shovel, rake',
+	packages             = ['shovel'],
+	package_dir          = {'shovel': 'shovel'},
+    package_data         = {'shovel': ['templates/*.tpl', 'static/css/*']},
+    include_package_data = True,
+	scripts              = ['bin/shovel', 'bin/shovel-server'],
+	classifiers          = [
         'License :: OSI Approved :: MIT License',
 		'Programming Language :: Python',
 		'Intended Audience :: Developers',

@@ -1,0 +1,177 @@
+#! /usr/bin/env python
+
+# Copyright (c) 2011 SEOmoz
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# ======================================================
+# This is to turn your shovel tasks into HTTP endpoints
+# ======================================================
+
+import argparse
+import pkg_resources
+# First off, read the arguments
+parser = argparse.ArgumentParser(description='Shovel with URLs')
+
+parser.add_argument('--port', dest='port', default=3000, help='What port to run on')
+parser.add_argument('--verbose', dest='verbose', action='store_true',
+    help='Be extra talkative')
+
+ver = pkg_resources.require('shovel')[0].version
+parser.add_argument('--version', action='version', version='Shovel v %s' %(ver), help='print the version of Shovel.')
+
+# Parse our arguments
+clargs, remaining = parser.parse_known_args()
+
+import shovel
+import logging
+if clargs.verbose:
+    shovel.logger.setLevel(logging.DEBUG)
+
+# Load in all the functions from shovel files
+shovel.load()
+
+import os
+import sys
+import pkgutil
+import traceback
+from cStringIO import StringIO
+
+import bottle
+from bottle import Bottle, run, request
+
+# This is the base path from which we'll import our templates
+bottle.TEMPLATE_PATH.append(os.path.join(shovel.__path__[0], 'templates/'))
+
+# And this is our bottle app
+app = Bottle()
+
+# This is a helper to allow us to run a task, and then get
+# back a dictionary of the various outputs -- stdout, stderr,
+# exceptions, return value
+def capture(f, *args, **kwargs):
+    stdout, stderr = sys.stdout, sys.stderr
+    sys.stdout = out = StringIO()
+    sys.stderr = err = StringIO()
+    result = {
+        'exception': None,
+        'stderr'   : None,
+        'stdout'   : None,
+        'return'   : None
+    }
+    try:
+        result['return'] = f(*args, **kwargs)
+    except:
+        result['exception'] = traceback.format_exc()
+    sys.stdout, sys.stderr = stdout, stderr
+    result['stderr'] = err.getvalue()
+    result['stdout'] = out.getvalue()
+    return result
+
+# And let's begin our bottle application
+# Our url format shall be:
+# host:port/task.name.and.so.forth?arg1&arg2&kwarg1=val1&arg3
+#
+# In particular, the task name is like it would be provided on the command
+# line, like 'foo.bar'. Any query parameters without a value will be considered
+# positional arguments, and all others will be considered keyword arguments.
+
+def help_helper(tasks):
+    # This tries to print the reported tasks in a nice, heirarchical fashion
+    modules = {}
+    for task in tasks:
+        m = task.fullname.split('.')
+        # Pop off the last name of the module
+        n = m.pop(-1)
+        mod = modules
+        for name in m:
+            mod.setdefault(name, {})
+            mod = mod[name]
+        
+        mod[task.name] = {
+            'name'  : task.name,
+            'full'  : task.fullname,
+            'file'  : task.file,
+            'line'  : task.line,
+            'module': task.module,
+            'doc'   : task.doc,
+            'args'  : repr(shovel.Args(task.spec))
+        }
+    
+    return modules
+
+def _parse(qs):
+    args   = []
+    kwargs = {}
+    for pair in qs.split('&'):
+        key, sep, value = pair.partition('=')
+        if key and not value:
+            args.append(key)
+        elif key:
+            kwargs[key] = value
+    
+    return args, kwargs
+
+@app.route('/help')
+def _help():
+    args, kwargs = _parse(request.query_string)
+    if len(args):
+        tasks = []
+        for name in args:
+            tasks.extend(shovel.Task.find(name))
+        tasks = [t for t in tasks if t]
+    else:
+        tasks = shovel.Task.find()
+    
+    return bottle.template(pkgutil.get_data('shovel', 'templates/help.tpl'), tasks=[{
+        'name'  : task.name,
+        'full'  : task.fullname,
+        'file'  : task.file,
+        'line'  : task.line,
+        'module': task.module,
+        'doc'   : task.doc,
+        'args'  : repr(shovel.Args(task.spec))
+    } for task in tasks])
+
+# Now, we'll catch the task names and execute accordingly
+@app.route('/<task>')
+def _task(task):
+    args, kwargs = _parse(request.query_string)
+    tasks = shovel.Task.find(task)
+    if len(tasks) == 1:
+        t = tasks[0]
+        arg = shovel.Args(t.spec)
+        arg.eval(*args, **kwargs)
+        return bottle.template(
+            pkgutil.get_data('shovel', 'templates/results.tpl'),
+            task   =t,
+            args   =repr(arg),
+            results=capture(t, *args, **kwargs))
+    else:
+        return {
+            'error': 'Found %i tasks matching %s' % (len(tasks), task)
+        }
+
+# And then we have all of our static content
+@app.route('/static/<path:path>')
+def callback(path):
+    return pkgutil.get_data('shovel', 'static/' + path)
+
+run(app, host='', port=clargs.port)
