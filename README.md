@@ -9,12 +9,19 @@ from the command line, without any modification to your shovel scripts.
 Philosophy of Shovel
 --------------------
 
-- Tasks should be easy to define
-- Making a function a task should change as little as possible
-- Arguments are strings -- we're not going to try to guess (there's an exception)
-- We value specificity
-- We'll inspect your tasks as much as we can
-- Tasks should be _accessible_
+- __Tasks should be easy to define__ -- one decorator, no options
+- __Turning a function into task should change as little as possible__ -- 
+	we don't want you to have to change the function's interface at all
+- __Arguments are strings__ -- rather than guess about the type of input
+	parameters, we're just going to pass them into your function as strings.
+	There's one exception, and that's for flags.
+- __We'll inspect your tasks as much as we can__ -- the `inspect` module is
+	extremely powerful, and we'll glean as much as possible about the arg
+	spec, documentation, name, etc. of your function as possible. You 
+	shouldn't be burned by telling _us_ what we can find out programatically
+- __Tasks should be accessible__ -- whether it's the command-line, through
+	the browser, or through a chat client, the tasks you define should be 
+	easily accessed
 
 Installing Shovel
 -----------------
@@ -23,7 +30,12 @@ Like most python projects, build with the included `setup.py`:
 
 	python setup.py install
 
-Currently the only dependency of shovel is the `argparse` module.
+Currently there are two dependencies:
+
+	# You'll need argparse
+	pip install argparse
+	# If you want to run the web app, you'll need bottle, too
+	pip install bottle
 
 Using Shovel
 ------------
@@ -172,6 +184,30 @@ A convenient feature of the shovel server is that it checks the last-modified
 time of the input shovel files, and reimports any definitions that have been
 updated since it last checked. So if you save your shovel files, the changes
 will be reflected in the web app.
+
+Motivation
+==========
+
+We had a project that had a fair number of semi-regularly used operational 
+tasks, and we got sick of copy-and-paste, and we also didn't want to have
+a standalone script complete with argparse for each and every one. We didn't
+like the alternatives out there, and so, `shovel`. The original version 
+constituted a weekend of work, and we've been eating our dog food ever since.
+
+Recently, we realized that a lot of these operational details were intuitive
+enough that we thought some of our support staff would want to make use of
+them. Rather than make them keep a copy of the code checked out locally, and
+use the command line, we figured it would be easiest to make HTTP endpoints
+for them. That way, we could just add buttons to existing interfaces, and life
+would be good.
+
+We soon realized that while a nice interface, it's a pain to maintain endpoints
+and command line tasks. So, why not make an interface that just runs those
+same tasks and does a little bit of presentation to make it a web interface?
+So now, without any additional work, you can start up the `shovel-server` and
+have access to all of the tasks you've been using from the command line. In
+this way, as developers we can keep one machine up to date and ready to run
+code, and still provide access to staff outside of the project.
 
 To-Do
 =====
