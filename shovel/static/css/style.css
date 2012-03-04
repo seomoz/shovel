@@ -43,3 +43,14 @@ body {
 	font-weight: normal;
 	padding: 10px;
 }
+
+.task-stderr {
+    background: pink;
+    font-weight: bold;
+}
+
+.task-exception {
+    background: red;
+    font-weight: bold;
+    color: white;
+}

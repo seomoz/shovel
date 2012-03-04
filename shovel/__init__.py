@@ -34,6 +34,9 @@ logger.addHandler(handler)
 
 # This is a global list of tasks that have been discovered
 _tasks = {}
+# This is a global list of the paths that we've discovered,
+# and when they were last modified
+_files = {}
 base   = os.path.abspath('.')
 
 # Make a task object for the provided object, and insert it into
@@ -161,7 +164,7 @@ class Task(object):
             previous = Task.find(t.fullname)
             if previous:
                 logger.warn('Task "%s" redefined' % t.fullname)
-                logger.warn('\tPrevious definition in %s at %i' % (previous.file, previous.line))
+                logger.warn('\tPrevious definition in %s at %i' % (previous[0].file, previous[0].line))
                 logger.warn('\tNew      definition in %s at %i' % (t.file, t.line))
             
             mods = t.fullname.split('.')
@@ -228,9 +231,10 @@ class Task(object):
         arg.eval(*args, **kwargs)
         args, kwargs = arg.getArgs()
         try:
-            f(*args, **kwargs)
+            return f(*args, **kwargs)
         except Exception as e:
             logger.exception('Failed to run task %s' % self.name)
+            raise(e)
     
     def dry(self, *args, **kwargs):
         '''Perform a dry-run of the task'''
@@ -300,18 +304,25 @@ def help(*names):
 
 def load():
     '''Load tasks from files'''
+    import os
     import re
     import sys
     import imp
+    import time
     p = os.path.abspath('./shovel.py')
-    if os.path.isfile(p):
+    if os.path.isfile(p) and _files.get(p, 0) < os.stat(p).st_mtime:
         with file(p) as f:
+            logger.info('Loading %s' % p)
             r = imp.find_module('shovel', ['.'])
             module = imp.load_module('shovel', r[0], r[1], r[2])
+            _files[p] = os.stat(p).st_mtime
     elif os.path.isdir(os.path.abspath('./shovel')):
         for root, dirs, files in os.walk(os.path.abspath('./shovel')):
             for name in [f for f in files if re.match(r'.+\.py$', f)]:
-                logger.info('Found python file %s' % os.path.join(root, name))
-                name, sep, ext = name.rpartition('.py')
-                r = imp.find_module(name, [root])
-                module = imp.load_module(name, r[0], r[1], r[2])
+                p = os.path.join(root, name)
+                if _files.get(p, 0) < os.stat(p).st_mtime:
+                    logger.info('Loading %s' % p)
+                    name, sep, ext = name.rpartition('.py')
+                    r = imp.find_module(name, [root])
+                    module = imp.load_module(name, r[0], r[1], r[2])
+                    _files[p] = os.stat(p).st_mtime

@@ -45,9 +45,6 @@ import logging
 if clargs.verbose:
     shovel.logger.setLevel(logging.DEBUG)
 
-# Load in all the functions from shovel files
-shovel.load()
-
 import os
 import sys
 import pkgutil
@@ -56,9 +53,6 @@ from cStringIO import StringIO
 
 import bottle
 from bottle import Bottle, run, request
-
-# This is the base path from which we'll import our templates
-bottle.TEMPLATE_PATH.append(os.path.join(shovel.__path__[0], 'templates/'))
 
 # And this is our bottle app
 app = Bottle()
@@ -77,7 +71,7 @@ def capture(f, *args, **kwargs):
         'return'   : None
     }
     try:
-        result['return'] = f(*args, **kwargs)
+        result['return'] = repr(f(*args, **kwargs))
     except:
         result['exception'] = traceback.format_exc()
     sys.stdout, sys.stderr = stdout, stderr
@@ -131,6 +125,8 @@ def _parse(qs):
 
 @app.route('/help')
 def _help():
+    # Re-load any definitions
+    shovel.load()
     args, kwargs = _parse(request.query_string)
     if len(args):
         tasks = []
@@ -153,6 +149,8 @@ def _help():
 # Now, we'll catch the task names and execute accordingly
 @app.route('/<task>')
 def _task(task):
+    # Reload any definitions
+    shovel.load()
     args, kwargs = _parse(request.query_string)
     tasks = shovel.Task.find(task)
     if len(tasks) == 1:

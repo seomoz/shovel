@@ -168,9 +168,12 @@ in the URL form:
 
 	shovel foo.bar --a --b
 
+A convenient feature of the shovel server is that it checks the last-modified
+time of the input shovel files, and reimports any definitions that have been
+updated since it last checked. So if you save your shovel files, the changes
+will be reflected in the web app.
+
 To-Do
 =====
 
-1. Ensure that the `shovel-server` utility can detect task failures
 1. Allow the `shovel-server` utility to return `application/json` when requested
-1. Have the `shovel-server` recognize when scripts have been updated, without restart

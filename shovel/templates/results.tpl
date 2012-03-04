@@ -6,30 +6,29 @@
 	<body>
 		<div class='task-container'>
 			<div class='task-name'>
-				{{ task.fullname }}
-				{{ args }}
+				{{ task.fullname }}{{ args }}
 			</div>
 			
 			%import cgi
-			%if results['stdout']:
+			%if results['stdout'] != None:
 			<div class='task-result'>
 				stdout: <div class='task-stdout'>{{! cgi.escape(results['stdout']).replace('\n', '<br/>') }}</div>
 			</div>
 			%end
 			
-			%if results['stderr']:
+			%if results['stderr'] != None:
 			<div class='task-result'>
 				stderr: <div class='task-stderr'>{{! cgi.escape(results['stderr']).replace('\n', '<br/>')}}</div>
 			</div>
 			%end
 			
-			%if results['return']:
+			%if results['return'] != None:
 			<div class='task-result'>
 				returned: <div class='task-returned'>{{! cgi.escape(results['return']).replace('\n', '<br/>')}}</div>
 			</div>
 			%end
 			
-			%if results['exception']:
+			%if results['exception'] != None:
 			<div class='task-result'>
 				exception: <div class='task-exception'>{{! cgi.escape(results['exception']).replace('\n', '<br/>')}}</div>
 			</div>
