@@ -19,7 +19,7 @@ def difference(a, b):
     shovel test.debug.difference 2 5
     http://localhost:3000/test.debug.difference?5&2 
     http://localhost:3000/test.debug.difference?a=2&b=5'''
-    if a < b:
+    if int(a) < int(b):
         raise Exception('a must be greater than or equal to than b')
     else:
         return int(a) - int(b)
