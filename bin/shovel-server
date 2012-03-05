@@ -57,28 +57,6 @@ from bottle import Bottle, run, request
 # And this is our bottle app
 app = Bottle()
 
-# This is a helper to allow us to run a task, and then get
-# back a dictionary of the various outputs -- stdout, stderr,
-# exceptions, return value
-def capture(f, *args, **kwargs):
-    stdout, stderr = sys.stdout, sys.stderr
-    sys.stdout = out = StringIO()
-    sys.stderr = err = StringIO()
-    result = {
-        'exception': None,
-        'stderr'   : None,
-        'stdout'   : None,
-        'return'   : None
-    }
-    try:
-        result['return'] = repr(f(*args, **kwargs))
-    except:
-        result['exception'] = traceback.format_exc()
-    sys.stdout, sys.stderr = stdout, stderr
-    result['stderr'] = err.getvalue()
-    result['stdout'] = out.getvalue()
-    return result
-
 # And let's begin our bottle application
 # Our url format shall be:
 # host:port/task.name.and.so.forth?arg1&arg2&kwarg1=val1&arg3
@@ -86,31 +64,6 @@ def capture(f, *args, **kwargs):
 # In particular, the task name is like it would be provided on the command
 # line, like 'foo.bar'. Any query parameters without a value will be considered
 # positional arguments, and all others will be considered keyword arguments.
-
-def help_helper(tasks):
-    # This tries to print the reported tasks in a nice, heirarchical fashion
-    modules = {}
-    for task in tasks:
-        m = task.fullname.split('.')
-        # Pop off the last name of the module
-        n = m.pop(-1)
-        mod = modules
-        for name in m:
-            mod.setdefault(name, {})
-            mod = mod[name]
-        
-        mod[task.name] = {
-            'name'  : task.name,
-            'full'  : task.fullname,
-            'file'  : task.file,
-            'line'  : task.line,
-            'module': task.module,
-            'doc'   : task.doc,
-            'args'  : repr(shovel.Args(task.spec))
-        }
-    
-    return modules
-
 def _parse(qs):
     args   = []
     kwargs = {}
@@ -161,7 +114,7 @@ def _task(task):
             pkgutil.get_data('shovel', 'templates/results.tpl'),
             task   =t,
             args   =repr(arg),
-            results=capture(t, *args, **kwargs))
+            results=t.capture(*args, **kwargs))
     else:
         return {
             'error': 'Found %i tasks matching %s' % (len(tasks), task)

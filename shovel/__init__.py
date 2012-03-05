@@ -236,6 +236,31 @@ class Task(object):
             logger.exception('Failed to run task %s' % self.name)
             raise(e)
     
+    # This is a helper to allow us to run a task, and then get
+    # back a dictionary of the various outputs -- stdout, stderr,
+    # exceptions, return value
+    def capture(self, *args, **kwargs):
+        import sys
+        import traceback
+        from StringIO import StringIO
+        stdout, stderr = sys.stdout, sys.stderr
+        sys.stdout = out = StringIO()
+        sys.stderr = err = StringIO()
+        result = {
+            'exception': None,
+            'stderr'   : None,
+            'stdout'   : None,
+            'return'   : None
+        }
+        try:
+            result['return'] = repr(self.__call__(*args, **kwargs))
+        except:
+            result['exception'] = traceback.format_exc()
+        sys.stdout, sys.stderr = stdout, stderr
+        result['stderr'] = err.getvalue()
+        result['stdout'] = out.getvalue()
+        return result
+    
     def dry(self, *args, **kwargs):
         '''Perform a dry-run of the task'''
         arg = Args(self.spec)
