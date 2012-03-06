@@ -265,29 +265,32 @@ class Task(object):
         '''Perform a dry-run of the task'''
         arg = Args(self.spec)
         arg.eval(*args, **kwargs)
-        print 'Would have executed:\n%s%s' % (self.name, repr(arg))
+        return 'Would have executed:\n%s%s' % (self.name, repr(arg))
     
     def help(self):
-        # Print the name of the function
-        print '=' * 50
-        print self.name
+        # Return the help for this function
+        s = '=' * 50 + '\n'
+        s += self.name + '\n'
                 
         # And the doc, if it exists
         if self.doc:
-            print '=' * 30
-            print self.doc
+            s += '=' * 30 + '\n'
+            s += self.doc + '\n'
         
         # Print where we read this function in from
-        print '=' * 30
-        print 'From %s on line %i' % (self.file, self.line)
+        s += '=' * 30 + '\n'
+        s += 'From %s on line %i\n' % (self.file, self.line)
         
         # And finally how it's invoked
         args = Args(self.spec)
-        print '=' * 30
-        print '%s%s' % (self.name, repr(args))
+        s += '=' * 30 + '\n'
+        s += '%s%s\n' % (self.name, repr(args))
+        return s
 
 def help_helper(tasks):
-    # This tries to print the reported tasks in a nice, heirarchical fashion
+    import re
+    # This returns a nice, pretty representation of the tasks' help
+    s = ''
     modules = []
     for task in tasks:
         # Get the module names for the task
@@ -305,27 +308,28 @@ def help_helper(tasks):
                 modules = modules[:i]
                 break
         for module in unmatched:
-            print '\t' * len(modules) + module + '/'
+            s += '\t' * len(modules) + module + '/\n'
             modules.append(module)
         
         if len(task.doc) > 50:
-            print '%30s => %s...' % (task.fullname, task.doc[0:47])
+            s += '%30s => %s...\n' % (task.fullname, re.sub(r'\s+', ' ', task.doc)[0:47])
         else:
-            print '%30s => %s' % (task.fullname, task.doc)
+            s += '%30s => %s\n' % (task.fullname, re.sub(r'\s+', ' ', task.doc))
+    return s
 
 def help(*names):
     '''Display information about the provided task name, or available tasks'''
     if not len(names):
-        help_helper(Task.find())
+        print help_helper(Task.find())
     else:
         for name in names:
             tasks = Task.find(name)
             if not tasks:
                 print 'Could not find task or module "%s"' % name
             elif len(tasks) == 1:
-                tasks[0].help()
+                print tasks[0].help()
             else:
-                help_helper(tasks)
+                print help_helper(tasks)
 
 def load():
     '''Load tasks from files'''

@@ -93,7 +93,7 @@ elif clargs.method:
     
     task = tasks[0]
     if clargs.dryRun:
-        task.dry(*args, **kwargs)
+        print task.dry(*args, **kwargs)
     else:
         task(*args, **kwargs)
 else:

@@ -1,0 +1,221 @@
+#! /usr/bin/env python
+
+# Copyright (c) 2011 SEOmoz
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# ======================================================
+# This is to turn your tasks into a campfire bot
+# ======================================================
+
+import argparse
+import pkg_resources
+
+# This is our version number
+ver = pkg_resources.require('shovel')[0].version
+
+# First off, read the arguments
+parser = argparse.ArgumentParser(description='Shovel with URLs')
+
+parser.add_argument('--subdomain', dest='subdomain', required=True,
+    help='Your Campfire subdomain')
+parser.add_argument('--user', dest='user', required=True,
+    help='Your Campfire username')
+parser.add_argument('--room', dest='room', required=True,
+    help='The room you want shovel to hang out in')
+parser.add_argument('--pass', dest='passwd', default=None,
+    help='Your Campfire password. Omit to be prompted')
+parser.add_argument('--no-ssl', dest='ssl', action='store_false', default=True,
+    help='Disable the use of ssl')
+parser.add_argument('--verbose', dest='verbose', action='store_true',
+    help='Be extra talkative')
+parser.add_argument('--version', action='version', version='Shovel v %s' %(ver),
+    help='print the version of Shovel.')
+clargs, remaining = parser.parse_known_args()
+
+# ==============================================
+# Handle Simple Options
+# ==============================================
+# If we didn't get a password, we should prompt the user
+if clargs.passwd == None:
+    import getpass
+    clargs.passwd = getpass.getpass('%s\'s Campfire Password: ' % clargs.user)
+
+# If they asked for verbosity, turn on verbosity
+import shovel
+import logging
+if clargs.verbose:
+    shovel.logger.setLevel(logging.DEBUG)
+else:
+    shovel.logger.setLevel(logging.INFO)
+
+# ==============================================
+# Callbacks for streaming from campfire
+# ==============================================
+def callback(message):
+    user = message.user
+    
+    if message.is_joining():
+        print '--> %s entered' % user.name
+    elif message.is_leaving():
+        print '<-- %s left the room' % user.name
+    elif message.is_text():
+        if message.is_by_current_user():
+            return
+        m = re.match(r'^\s*shovel\s*(.+)$', message.body, re.I)
+        if not m:
+            return
+        
+        args, kwargs = parse(m.group(1))
+        # Alright, if no args were provided, we should print out something helpful
+        if not args:
+            message.room.speak('Usage: shovel [--dry-run] [--verbose] cmd <args>')
+            return
+        else:
+            shovel.logger.debug('Args: %s' % repr(args))
+        
+        # Otherwise, if the first argument is 'help', print help
+        cmd = args.pop(0)
+        if cmd == 'help':
+            # Re-load any definitions
+            shovel.load()
+            if len(args):
+                tasks = []
+                for name in args:
+                    tasks.extend(shovel.Task.find(name))
+                tasks = [t for t in tasks if t]
+            else:
+                tasks = shovel.Task.find()
+            
+            if len(tasks) == 1:
+                message.room.speak(tasks[0].help())
+            else:
+                message.room.speak(shovel.help_helper(tasks) or 'Found no matching tasks.')
+        else:
+            shovel.load()
+            tasks = shovel.Task.find(cmd)
+            if len(tasks) == 0:
+                message.room.speak('Could not find task "%s"' % cmd)
+            elif len(tasks) > 1:
+                message.room.speak('Found more than one task matching "%s"' % cmd)
+            elif kwargs.pop('dry-run', False):
+                message.room.speak(tasks[0].dry(*args, **kwargs))
+            else:
+                arg = shovel.Args(tasks[0].spec)
+                arg.eval(*args, **kwargs)
+                message.room.speak('Running %s%s' % (cmd, repr(arg)))
+                results = tasks[0].capture(*args, **kwargs)
+                response  = 'stdout:\n' + results.get('stdout', '') + '\n'
+                response += 'stderr:\n' + results.get('stderr', '') + '\n'
+                if results.get('exception'):
+                    response += 'exception:\n' + results.get('exception', '')
+                else:
+                    response += 'return:\n' + results.get('return', '')
+                message.room.speak(response)
+
+def errback(e, room):
+    shovel.logger.error('Errback: %s' % repr(e))
+    room.leave()
+
+# ==============================================
+# Main code
+# ==============================================
+import re
+import pyfire
+
+try:
+    campfire = pyfire.Campfire(clargs.subdomain, clargs.user, clargs.passwd, ssl=clargs.ssl)
+    shovel.logger.info('Logged in as %s on %s' % (clargs.user, clargs.subdomain))
+    room = campfire.get_room_by_name(clargs.room)
+    room.join()
+    shovel.logger.info('Joined room %s' % clargs.room)
+    stream = room.get_stream(error_callback=errback)
+    stream.attach(callback).start()
+    shovel.logger.info('Listening to room %s' % clargs.room)    
+except pyfire.connection.AuthenticationError:
+    shovel.logger.exception('Failed to authenticate to %s on %s' % (clargs.user, clargs.subdomain))
+    exit(1)
+
+def parse(s):
+    # Given a string, this will return a tuple:
+    #   (args, kwargs)
+    args   = []
+    kwargs = {}
+    kw     = None
+    shovel.logger.debug(s)
+    for item in re.split(r'\s+', s):
+        # If it's been given an argument name, save it and wait for the
+        # next argument to be parsed
+        if item.startswith('--'):
+            # If this item begins with a '--', but there already exists
+            # a keyword argument name, then we should treat that last 
+            # name as a flag for 'True'
+            if item == '--dry-run':
+                kwargs['dry-run'] = True
+                continue
+            if kw:
+                kwargs[kw] = True
+            kw, sep, value = item.strip('-').partition('=')
+            if value:
+                kwargs[kw] = value
+                kw = None
+        elif kw != None:
+            kwargs[kw] = item
+            kw = None
+        else:
+            args.append(item)
+    
+    # If there's still a keyword argument name, we'll treat is as a
+    # flag to set that option to True.
+    if kw:
+        kwargs[kw] = True
+    
+    return args, kwargs
+
+def handle(args):
+    # Parse our arguments
+    args, rem = _parser.parse_known_args(args)
+    additional
+
+    args, kwargs = parse(remaining)
+    shovel.load()
+    if clargs.method == 'help':
+        shovel.help(*args, **kwargs)
+    elif clargs.method:
+        # Try to get the first command provided
+        tasks = shovel.Task.find(clargs.method)
+        if not tasks:
+            print 'Could not find task "%s"' % clargs.method
+            exit(1)
+    
+        if len(tasks) > 1:
+            print 'Specifier "%s" matches multiple tasks:' % clargs.method
+            for task in tasks:
+                print '\t%s' % task.fullname
+            exit(2)
+    
+        task = tasks[0]
+        if clargs.dryRun:
+            task.dry(*args, **kwargs)
+        else:
+            task(*args, **kwargs)
+    else:
+        print 'Help'
+    
