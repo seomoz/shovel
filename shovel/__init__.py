@@ -343,7 +343,7 @@ def load():
         with file(p) as f:
             logger.info('Loading %s' % p)
             r = imp.find_module('shovel', ['.'])
-            module = imp.load_module('shovel', r[0], r[1], r[2])
+            module = imp.load_module('shovel', *r)
             _files[p] = os.stat(p).st_mtime
     elif os.path.isdir(os.path.abspath('./shovel')):
         for root, dirs, files in os.walk(os.path.abspath('./shovel')):
@@ -353,5 +353,5 @@ def load():
                     logger.info('Loading %s' % p)
                     name, sep, ext = name.rpartition('.py')
                     r = imp.find_module(name, [root])
-                    module = imp.load_module(name, r[0], r[1], r[2])
+                    module = imp.load_module(name, *r)
                     _files[p] = os.stat(p).st_mtime

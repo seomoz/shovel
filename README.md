@@ -1,7 +1,7 @@
 Shovel
 ======
 
-Shovel is like Rake for python. Turn python funcitons into tasks simply, and 
+Shovel is like Rake for python. Turn python functions into tasks simply, and 
 access and invoke them from the command line. 'Nuff said. __New__ Shovel also
 now has support for invoking the same tasks in the browser you'd normally run
 from the command line, without any modification to your shovel scripts.
