@@ -18,7 +18,7 @@ Philosophy of Shovel
 - __We'll inspect your tasks as much as we can__ -- the `inspect` module is
 	extremely powerful, and we'll glean as much as possible about the arg
 	spec, documentation, name, etc. of your function as possible. You 
-	shouldn't be burned by telling _us_ what we can find out programatically
+	shouldn't be burdened by telling _us_ what we can find out programatically
 - __Tasks should be accessible__ -- whether it's the command-line, through
 	the browser, or through a chat client, the tasks you define should be 
 	easily accessed
