@@ -340,7 +340,7 @@ def load():
     import time
     p = os.path.abspath('./shovel.py')
     if os.path.isfile(p) and _files.get(p, 0) < os.stat(p).st_mtime:
-        with file(p) as f:
+        with open(p) as f:
             logger.info('Loading %s' % p)
             r = imp.find_module('shovel', ['.'])
             module = imp.load_module('shovel', *r)

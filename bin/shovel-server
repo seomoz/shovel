@@ -25,6 +25,7 @@
 # This is to turn your shovel tasks into HTTP endpoints
 # ======================================================
 
+from __future__ import print_function
 import argparse
 import pkg_resources
 # First off, read the arguments
@@ -49,7 +50,10 @@ import os
 import sys
 import pkgutil
 import traceback
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import bottle
 from bottle import Bottle, run, request
