@@ -25,6 +25,7 @@
 # This is to turn your tasks into a campfire bot
 # ======================================================
 
+from __future__ import print_function
 import argparse
 import pkg_resources
 
@@ -73,9 +74,9 @@ def callback(message):
     user = message.user
     
     if message.is_joining():
-        print '--> %s entered' % user.name
+        print('--> %s entered' % user.name)
     elif message.is_leaving():
-        print '<-- %s left the room' % user.name
+        print('<-- %s left the room' % user.name)
     elif message.is_text():
         if message.is_by_current_user():
             return
@@ -202,13 +203,13 @@ def handle(args):
         # Try to get the first command provided
         tasks = shovel.Task.find(clargs.method)
         if not tasks:
-            print 'Could not find task "%s"' % clargs.method
+            print('Could not find task "%s"' % clargs.method)
             exit(1)
     
         if len(tasks) > 1:
-            print 'Specifier "%s" matches multiple tasks:' % clargs.method
+            print('Specifier "%s" matches multiple tasks:' % clargs.method)
             for task in tasks:
-                print '\t%s' % task.fullname
+                print('\t%s' % task.fullname)
             exit(2)
     
         task = tasks[0]
@@ -217,5 +218,5 @@ def handle(args):
         else:
             task(*args, **kwargs)
     else:
-        print 'Help'
+        print('Help')
     
