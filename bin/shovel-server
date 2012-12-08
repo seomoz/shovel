@@ -41,6 +41,15 @@ parser.add_argument('--version', action='version', version='Shovel v %s' %(ver),
 # Parse our arguments
 clargs, remaining = parser.parse_known_args()
 
+# Store bare shovel modele so pkgutil can resolve template paths
+import sys
+p0 = sys.path[0]
+sys.path = sys.path[1:]
+import shovel
+sys.modules['sshovel'] = sys.modules['shovel']
+del sys.modules['shovel']
+sys.path.append(p0)
+
 import shovel
 import logging
 if clargs.verbose:
@@ -93,7 +102,7 @@ def _help():
     else:
         tasks = shovel.Task.find()
     
-    return bottle.template(pkgutil.get_data('shovel', 'templates/help.tpl'), tasks=[{
+    return bottle.template(pkgutil.get_data('sshovel', 'templates/help.tpl'), tasks=[{
         'name'  : task.name,
         'full'  : task.fullname,
         'file'  : task.file,
@@ -115,7 +124,7 @@ def _task(task):
         arg = shovel.Args(t.spec)
         arg.eval(*args, **kwargs)
         return bottle.template(
-            pkgutil.get_data('shovel', 'templates/results.tpl'),
+            pkgutil.get_data('sshovel', 'templates/results.tpl'),
             task   =t,
             args   =repr(arg),
             results=t.capture(*args, **kwargs))
@@ -127,6 +136,6 @@ def _task(task):
 # And then we have all of our static content
 @app.route('/static/<path:path>')
 def callback(path):
-    return pkgutil.get_data('shovel', 'static/' + path)
+    return pkgutil.get_data('sshovel', 'static/' + path)
 
 run(app, host='', port=clargs.port)
