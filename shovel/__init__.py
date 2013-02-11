@@ -24,6 +24,7 @@
 import os
 import logging
 import inspect
+from operator import attrgetter
 
 logger = logging.getLogger('shovel')
 handler = logging.StreamHandler()
@@ -155,6 +156,8 @@ class Task(object):
                 remaining.extend(next.values())
             else:
                 found.append(next)
+        found.sort(key=attrgetter('fullname'))
+
         return found
     
     @classmethod
