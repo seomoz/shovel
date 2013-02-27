@@ -41,6 +41,7 @@ clargs, remaining = parser.parse_known_args()
 
 import shovel
 import logging
+import os
 import sys
 if clargs.verbose:
     shovel.logger.setLevel(logging.DEBUG)
@@ -84,14 +85,14 @@ elif clargs.method:
     # Try to get the first command provided
     tasks = shovel.Task.find(clargs.method)
     if not tasks:
-        print('Could not find task "%s"' % clargs.method, file=sys.stderr)
+        msg = 'Could not find task "%s"%s' % (clargs.method, os.linesep)
+        sys.stderr.write(msg)
         exit(1)
     
     if len(tasks) > 1:
-        print('Specifier "%s" matches multiple tasks:' % clargs.method,
-              file=sys.stderr)
-        for task in tasks:
-            print('\t%s' % task.fullname, file=sys.stderr)
+        msg = ['Specifier "%s" matches multiple tasks:' % clargs.method]
+        msg += ['\t%s' % task.fullname for task in tasks]
+        sys.stderr.write(os.linesep.join(msg))
         exit(2)
     
     task = tasks[0]
