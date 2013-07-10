@@ -85,14 +85,13 @@ elif clargs.method:
     # Try to get the first command provided
     tasks = shovel.Task.find(clargs.method)
     if not tasks:
-        msg = 'Could not find task "%s"%s' % (clargs.method, os.linesep)
-        sys.stderr.write(msg)
+        print('Could not find task "%s"' % clargs.method, file=sys.stderr)
         exit(1)
     
     if len(tasks) > 1:
-        msg = ['Specifier "%s" matches multiple tasks:' % clargs.method]
-        msg += ['\t%s' % task.fullname for task in tasks]
-        sys.stderr.write(os.linesep.join(msg))
+        print('Specifier "%s" matches multiple tasks:' % clargs.method, file=sys.stderr)
+        for task in tasks:
+            print('\t%s' % task.fullname, file=sys.stderr)
         exit(2)
     
     task = tasks[0]
