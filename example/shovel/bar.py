@@ -8,7 +8,7 @@ def hello(name='Foo'):
         shovel bar.hello
         shovel bar.hello --name=Erin
         http://localhost:3000/bar.hello?Erin'''
-    print 'Hello, %s' % name
+    print('Hello, %s' % name)
 
 @task
 def args(*args):
@@ -21,7 +21,7 @@ def args(*args):
         shovel bar.args 1 2 3 4
         http://localhost:3000/bar.args?1&2&3&4'''
     for arg in args:
-        print 'You said "%s"' % arg
+        print('You said "%s"' % arg)
 
 @task
 def kwargs(**kwargs):
@@ -34,4 +34,4 @@ def kwargs(**kwargs):
         shovel bar.kwargs --foo=5 --bar 5 --howdy hey
         http://localhost:3000/bar.kwargs?foo=5&bar=5&howdy=hey'''
     for key, val in kwargs.items():
-        print 'You said "%s" => "%s"' % (key, val)
+        print('You said "%s" => "%s"' % (key, val))
