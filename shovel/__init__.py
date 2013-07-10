@@ -323,16 +323,16 @@ def help_helper(tasks):
 def help(*names):
     '''Display information about the provided task name, or available tasks'''
     if not len(names):
-        print help_helper(Task.find())
+        print(help_helper(Task.find()))
     else:
         for name in names:
             tasks = Task.find(name)
             if not tasks:
-                print 'Could not find task or module "%s"' % name
+                print('Could not find task or module "%s"' % name)
             elif len(tasks) == 1:
-                print tasks[0].help()
+                print(tasks[0].help())
             else:
-                print help_helper(tasks)
+                print(help_helper(tasks))
 
 def load():
     '''Load tasks from files'''
