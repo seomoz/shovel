@@ -7,7 +7,7 @@ def verbose():
     Examples:
     shovel test.debug.verbose
     http://localhost:3000/test.debug.verbose'''
-    print 'Good news, everyone!\n' * 100
+    print('Good news, everyone!\n' * 100)
 
 @task
 def difference(a, b):

@@ -7,4 +7,4 @@ def howdy(times=1):
     Examples:
         shovel foo.howdy 10
         http://localhost:3000/foo.howdy?15'''
-    print '\n'.join(['Howdy'] * int(times))
+    print('\n'.join(['Howdy'] * int(times)))
