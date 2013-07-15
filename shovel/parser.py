@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (c) 2013 SEOmoz
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,21 +19,33 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import logging
-
-# Logging, obviously
-logger = logging.getLogger('shovel')
-handler = logging.StreamHandler()
-handler.setLevel(logging.CRITICAL)
-formatter = logging.Formatter('[%(levelname)s] %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+'''Helping functions for parsing CLI interface stuff'''
 
 
-from shovel.tasks import Task
+def parse(tokens):
+    '''Parse the provided string to produce *args and **kwargs'''
+    args = []
+    kwargs = {}
+    last = None
+    for token in tokens:
+        if token.startswith('--'):
+            # If this is a keyword flag, but we've already got one that we've
+            # parsed, then we're going to interpret it as a bool
+            if last:
+                kwargs[last] = True
+            # See if it is the --foo=5 style
+            last, _, value = token.strip('-').partition('=')
+            if value:
+                kwargs[last] = value
+                last = None
+        elif last != None:
+            kwargs[last] = token
+            last = None
+        else:
+            args.append(token)
 
+    # If there's a dangling last, set that bool
+    if last:
+        kwargs[last] = True
 
-def task(func):
-    '''Register this task with shovel, but return the original function'''
-    Task.make(func)
-    return func
+    return args, kwargs

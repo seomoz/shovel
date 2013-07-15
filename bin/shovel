@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # Copyright (c) 2011 SEOmoz
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -9,10 +9,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -22,6 +22,9 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from __future__ import print_function
+import os
+import sys
+import logging
 import argparse
 import pkg_resources
 # First off, read the arguments
@@ -31,69 +34,52 @@ parser.add_argument('method', help='The task to run')
 parser.add_argument('--verbose', dest='verbose', action='store_true',
     help='Be extra talkative')
 parser.add_argument('--dry-run', dest='dryRun', action='store_true',
-    help='Don\'t actually run the command, but show the args that would be used')
+    help='Show the args that would be used')
 
 ver = pkg_resources.require('shovel')[0].version
-parser.add_argument('--version', action='version', version='Shovel v %s' %(ver), help='print the version of Shovel.')
+parser.add_argument('--version', action='version',
+    version='Shovel v %s' % ver, help='print the version of Shovel.')
 
 # Parse our arguments
 clargs, remaining = parser.parse_known_args()
 
-import shovel
-import logging
-import os
-import sys
-if clargs.verbose:
-    shovel.logger.setLevel(logging.DEBUG)
+from shovel.tasks import Shovel
+from shovel.parser import parse
+from shovel import logger, help
 
-def parse(remaining):
-    # Now build up our arguments to the function
-    args   = []
-    kwargs = {}
-    kw     = None
-    for item in remaining:
-        # If it's been given an argument name, save it and wait for the
-        # next argument to be parsed
-        if item.startswith('--'):
-            # If this item begins with a '--', but there already exists
-            # a keyword argument name, then we should treat that last 
-            # name as a flag for 'True'
-            if kw:
-                kwargs[kw] = True
-            kw, sep, value = item.strip('-').partition('=')
-            if value:
-                kwargs[kw] = value
-                kw = None
-        elif kw != None:
-            kwargs[kw] = item
-            kw = None
-        else:
-            args.append(item)
-    
-    # If there's still a keyword argument name, we'll treat is as a
-    # flag to set that option to True.
-    if kw:
-        kwargs[kw] = True
-    
-    return args, kwargs
+if clargs.verbose:
+    logger.setLevel(logging.DEBUG)
 
 args, kwargs = parse(remaining)
-shovel.load()
+
+# Import all of the files we want
+shovel = Shovel()
+for path in [
+    os.path.expanduser('~/.shovel.py'),
+    os.path.expanduser('~/.shovel')]:
+    if os.path.exists(path):
+        shovel.read(path, os.path.expanduser('~/'))
+
+for path in ['shovel.py', 'shovel']:
+    if os.path.exists(path):
+        shovel.read(path)
+
+# If it's help we're looking for, look no further
 if clargs.method == 'help':
-    shovel.help(*args, **kwargs)
+    print(help.shovel_help(shovel, *args, **kwargs))
 elif clargs.method:
     # Try to get the first command provided
-    tasks = shovel.Task.find(clargs.method)
+    tasks = shovel.tasks(clargs.method)
     if not tasks:
         print('Could not find task "%s"' % clargs.method, file=sys.stderr)
         exit(1)
-    
+
     if len(tasks) > 1:
         print('Specifier "%s" matches multiple tasks:' % clargs.method, file=sys.stderr)
         for task in tasks:
             print('\t%s' % task.fullname, file=sys.stderr)
         exit(2)
-    
+
     task = tasks[0]
     if clargs.dryRun:
         print(task.dry(*args, **kwargs))
