@@ -1,18 +1,19 @@
 #! /usr/bin/env python
 import sys
 
+extra = {}
+
 try:
     from setuptools import setup
-    extra = {
-        'install_requires': ['argparse']
-    }
+    if sys.version_info < (2, 7):
+        extra['install_requires'] = ['argparse']
     if sys.version_info >= (3,):
         extra['use_2to3'] = True
 except ImportError:
     from distutils.core import setup
-    extra = {
-        'dependencies': ['argparse']
-    }
+    if sys.version_info < (2, 7):
+        extra['dependencies'] = ['argparse']
+
 
 setup(name               = 'shovel',
     version              = '0.3.0',
