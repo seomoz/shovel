@@ -101,7 +101,10 @@ class Args(object):
                 total = len([a for a in self.args if len(a) == 1])
                 raise ValueError('Argument %i not provided. Needs %i more' % (count, total))
             else:
-                name, value = pair
+                try:
+                    name, value = pair
+                except ValueError as e:
+                    raise ValueError("Possibly incorrect number of arguments supplied.", e)
                 args.append(value)
                 count += 1
         args.extend(self.varargs)
