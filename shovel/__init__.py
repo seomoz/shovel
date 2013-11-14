@@ -56,7 +56,7 @@ class Args(object):
         defaults.reverse()
         
         # Zip together the default arguments
-        self._args = zip(args, defaults)
+        self._args = list(zip(args, defaults))
         # And get the remaining args, and append them with
         # no default argument args
         self._args.extend((arg) for arg in args[len(self._args):])
