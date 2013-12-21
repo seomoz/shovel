@@ -5,4 +5,4 @@ shovel.egg-info/*
 *shovel.py
 shovel/*
 */shovel/*
-
+*/.shovel_tasks
