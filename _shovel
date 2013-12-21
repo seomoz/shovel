@@ -1,0 +1,8 @@
+#compdef shovel
+
+_shovel() {
+  if [[ -f shovel.py || -d shovel ]]; then
+    shovel tasks | cut -d " " -f 1 > .shovel_tasks
+    compadd `cat .shovel_tasks`
+  fi
+}

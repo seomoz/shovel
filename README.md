@@ -83,9 +83,7 @@ Command Line Utility
 --------------------
 
 Invoke shovel with the `shovel` command. If you would like to know more about
-what functions that shovel knows about:
-
-	shovel help
+what functions that shovel knows about, ask `shovel help` or `shovel tasks`.
 
 If you'd like more information on a specific task or module, you can ask for
 more information with shovel help. Shovel can figure out lots of things about
@@ -132,6 +130,17 @@ if we executed the following, then `a` and `b` would be passed as True:
 
 The reason for this is that flags are common for tasks, and it's a relatively
 unambiguous syntax. To a human, the meaning is clear, and now it is to shovel.
+
+### Command line auto-complete
+
+Available for zsh.
+
+1. Tell zsh where to find the script `_shovel`. For example, put it at
+   `~/.zsh/completion/_shovel` and somewhere in .zshrc before you call
+   `compinit` add the commond `fpath=(~/.zsh/completion/ $fpath)`.
+2. Navigate to a directory where you've tasks in `shovel.py` or under
+   `shovel/`, and hit `TAB` twice. Or, type the first couple letters of a
+   command and hit `TAB` once. Boom.
 
 Browser
 -------
