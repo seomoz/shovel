@@ -76,6 +76,23 @@ def run(*args):
     # If it's help we're looking for, look no further
     if clargs.method == 'help':
         print(help.shovel_help(shovel, *args, **kwargs))
+    if clargs.method == 'tasks':
+        tasks = [(tsk.fullname, tsk.doc.replace('\n', ' '))
+            for tsk in shovel.Task.find()]
+        if not tasks:
+            print('No tasks found!')
+        else:
+            width = 80
+            import shutil
+            try:
+                width, height = shutil.get_terminal_size(fallback=(0, width))
+            except AttributeError as e:
+                pass
+            max_name_len = max([len(e[0]) for e in tasks])
+            for tsk, doc in tasks:
+                pad = max_name_len + 2 - len(tsk)
+                doclen = width - max_name_len - 5
+                print('%s%s# %s' % (tsk, ' ' * pad, doc[:doclen]))
     elif clargs.method:
         # Try to get the first command provided
         try:

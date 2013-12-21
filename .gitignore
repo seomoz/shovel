@@ -5,3 +5,4 @@ shovel.egg-info/*
 *shovel.py
 */shovel/*
 .coverage
+*/.shovel_tasks
