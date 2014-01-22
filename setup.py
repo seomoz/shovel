@@ -27,8 +27,7 @@ setup(name               = 'shovel',
     package_dir          = {'shovel': 'shovel'},
     package_data         = {'shovel': ['templates/*.tpl', 'static/css/*']},
     include_package_data = True,
-    scripts              = [
-        'bin/shovel', 'bin/shovel-server', 'bin/shovel-campfire'],
+    scripts              = ['bin/shovel'],
     classifiers          = [
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',

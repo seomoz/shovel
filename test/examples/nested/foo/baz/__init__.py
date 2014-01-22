@@ -1,4 +1,4 @@
-'''A test about name structure'''
+'''Dummy shovel tasks for testing'''
 
 from shovel import task
 

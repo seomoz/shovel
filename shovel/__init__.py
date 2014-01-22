@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2014 Moz
+# Copyright (c) 2011-2014 Moz
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -26,7 +26,7 @@ import logging
 # Logging, obviously
 logger = logging.getLogger('shovel')
 handler = logging.StreamHandler()
-handler.setLevel(logging.CRITICAL)
+handler.setLevel(logging.ERROR)
 formatter = logging.Formatter('[%(levelname)s] %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
