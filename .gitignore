@@ -4,4 +4,4 @@ shovel.egg-info/*
 *.pyc
 *shovel.py
 */shovel/*
-
+.coverage
