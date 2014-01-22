@@ -66,6 +66,34 @@ class TestArgs(unittest.TestCase):
         self.assertRaises(Exception, args.get, 1, 2)
         self.assertRaises(Exception, args.get, 1, 2, 3, 4)
 
+    def test_str_basic(self):
+        '''Gets a representation of a basic function'''
+        def foo(a, b=2):
+            pass
+
+        self.assertEqual(str(Args.parse(foo)), '(a, b=2)')
+
+    def test_str_complex(self):
+        '''Gets a representation of a more complex function'''
+        def foo(a, b=2, *args, **kwargs):
+            pass
+
+        self.assertEqual(str(Args.parse(foo)), '(a, b=2, *args, **kwargs)')
+
+    def test_explain(self):
+        '''Gets a description of how arguments are applied'''
+        def foo(a, b=2, *args, **kwargs):
+            pass
+
+        actual = [line.strip() for line in
+            Args.parse(foo).explain(5, 3, 15, bar=20).split('\n')]
+        expected = [
+            'a = 5',
+            'b = 3 (overridden)',
+            'args = (15,)',
+            'kwargs = {\'bar\': 20}']
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

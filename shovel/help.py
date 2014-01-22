@@ -53,14 +53,12 @@ def heirarchical_help(shovel, prefix):
     fmt = '%%%is => %%-50s' % longest
     for name, docstring, level in tuples:
         if not docstring:
-            result.append('')
             result.append('    ' * level + name + '/')
         else:
             docstring = re.sub(r'\s+', ' ', docstring).strip()
             if len(docstring) > 50:
                 docstring = docstring[:47] + '...'
             result.append(fmt % (name, docstring))
-    result.pop(0)
     return '\n'.join(result)
 
 

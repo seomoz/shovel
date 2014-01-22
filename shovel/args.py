@@ -54,7 +54,17 @@ class Args(object):
         self._varargs = spec.varargs
         self._kwargs = spec.keywords
 
-    def explain(self, *args, **kwargs):  # pragma: no cover
+    def __str__(self):
+        results = []
+        results.extend(self._args)
+        results.extend('%s=%s' % (k, v) for k, v in self._defaults)
+        if self._varargs:
+            results.append('*%s' % self._varargs)
+        if self._kwargs:
+            results.append('**%s' % self._kwargs)
+        return '(' + ', '.join(results) + ')'
+
+    def explain(self, *args, **kwargs):
         '''Return a string that describes how these args are interpreted'''
         args = self.get(*args, **kwargs)
         results = ['%s = %s' % (name, value) for name, value in args.required]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2013 SEOmoz
+# Copyright (c) 2014 Moz
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -32,10 +32,5 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-from shovel.tasks import Task
-
-
-def task(func):
-    '''Register this task with shovel, but return the original function'''
-    Task.make(func)
-    return func
+from .tasks import task
+from .runner import run

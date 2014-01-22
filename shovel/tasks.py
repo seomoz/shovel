@@ -32,6 +32,12 @@ from shovel import logger
 from shovel.args import Args
 
 
+def task(func):
+    '''Register this task with shovel, but return the original function'''
+    Task.make(func)
+    return func
+
+
 class Shovel(object):
     '''A collection of tasks contained in a file or folder'''
     @classmethod
@@ -181,13 +187,11 @@ class Task(object):
         for task in cls._cache:
             parts = relative.split(os.path.sep)
             parts.append(task.name)
-            print 'Starting parts: %s' % parts
             # If it's either in shovel.py, or folder/__init__.py, then we
             # should consider it as being at one level above that file
             parts = [part.strip('.') for part in parts if part not in
                 ('shovel', '.shovel', '__init__', '.', '..', '')]
             task.fullname = '.'.join(parts)
-            print 'Makes fullname: %s' % task.fullname
             logger.debug('Found task %s in %s' % (task.fullname, task.module))
         cached = cls._cache
         cls._cache = []
@@ -303,6 +307,6 @@ class Task(object):
             '=' * 30,
             'From %s on line %i' % (self.file, self.line),
             '=' * 30,
-            '%s%s' % (self.name, repr(Args(self.spec)))
+            '%s%s' % (self.name, str(Args(self.spec)))
         ])
         return os.linesep.join(result)

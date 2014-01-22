@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# Copyright (c) 2011 SEOmoz
+# Copyright (c) 2014 Moz
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -21,69 +21,5 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from __future__ import print_function
-import os
-import sys
-import logging
-import argparse
-import pkg_resources
-# First off, read the arguments
-parser = argparse.ArgumentParser(description='Rake, for Python')
-
-parser.add_argument('method', help='The task to run')
-parser.add_argument('--verbose', dest='verbose', action='store_true',
-    help='Be extra talkative')
-parser.add_argument('--dry-run', dest='dryRun', action='store_true',
-    help='Show the args that would be used')
-
-ver = pkg_resources.require('shovel')[0].version
-parser.add_argument('--version', action='version',
-    version='Shovel v %s' % ver, help='print the version of Shovel.')
-
-# Parse our arguments
-clargs, remaining = parser.parse_known_args()
-
-from shovel.tasks import Shovel
-from shovel.parser import parse
-from shovel import logger, help
-
-if clargs.verbose:
-    logger.setLevel(logging.DEBUG)
-
-args, kwargs = parse(remaining)
-
-# Import all of the files we want
-shovel = Shovel()
-for path in [
-    os.path.expanduser('~/.shovel.py'),
-    os.path.expanduser('~/.shovel')]:
-    if os.path.exists(path):
-        shovel.read(path, os.path.expanduser('~/'))
-
-for path in ['shovel.py', 'shovel']:
-    if os.path.exists(path):
-        shovel.read(path)
-
-# If it's help we're looking for, look no further
-if clargs.method == 'help':
-    print(help.shovel_help(shovel, *args, **kwargs))
-elif clargs.method:
-    # Try to get the first command provided
-    tasks = shovel.tasks(clargs.method)
-    if not tasks:
-        print('Could not find task "%s"' % clargs.method, file=sys.stderr)
-        exit(1)
-
-    if len(tasks) > 1:
-        print('Specifier "%s" matches multiple tasks:' % clargs.method, file=sys.stderr)
-        for task in tasks:
-            print('\t%s' % task.fullname, file=sys.stderr)
-        exit(2)
-
-    task = tasks[0]
-    if clargs.dryRun:
-        print(task.dry(*args, **kwargs))
-    else:
-        task(*args, **kwargs)
-else:
-    print('Help')
+import shovel
+shovel.run()
