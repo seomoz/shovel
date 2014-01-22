@@ -1,5 +1,6 @@
 Shovel
 ======
+[![Build Status](https://travis-ci.org/seomoz/shovel.png?branch=travis)](https://travis-ci.org/seomoz/shovel)
 
 Shovel is like Rake for python. Turn python functions into tasks simply, and 
 access and invoke them from the command line. 'Nuff said. __New__ Shovel also
