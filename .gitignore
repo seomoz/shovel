@@ -3,6 +3,5 @@ dist/*
 shovel.egg-info/*
 *.pyc
 *shovel.py
-shovel/*
 */shovel/*
-
+.coverage
