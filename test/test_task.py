@@ -47,7 +47,6 @@ class TestTask(unittest.TestCase):
             pth = 'test/examples/overrides/%s' % name
             shovel.read(pth, pth)
         self.assertNotEqual(shovel, None)
-        print 'Tasks: %s' % shovel.items()
         self.assertNotEqual(shovel['foo.bar'].overrides, None)
 
     def test_keys_items(self):
@@ -142,7 +141,6 @@ class TestTask(unittest.TestCase):
         top-level'''
         shovel = Shovel.load('test/examples/toplevel/one',
             'test/examples/toplevel/one')
-        print 'Shovel items: %s' % shovel.items()
         _, tasks = zip(*shovel.items())
         # self.assertEqual(len(tasks), 4)
         self.assertEqual(set([t.fullname for t in tasks]),

@@ -21,6 +21,8 @@
 
 '''Argument -parsing and -evaluating tools'''
 
+from __future__ import print_function
+
 import inspect
 from collections import namedtuple
 
@@ -45,7 +47,7 @@ class Args(object):
         # we'll add the required positional arguments and get a list of all
         # args and whether or not they have defaults
         self._defaults = list(reversed(
-            zip(reversed(spec.args), reversed(spec.defaults or []))
+            list(zip(reversed(spec.args or []), reversed(spec.defaults or [])))
         ))
         # Now, take all the args that don't have a default
         self._args = spec.args[:(len(spec.args) - len(self._defaults))]
@@ -85,13 +87,13 @@ class Args(object):
         required = [arg for arg in self._args if arg not in kwargs]
         if len(args) < len(required):
             raise TypeError('Missing arguments %s' % required[len(args):])
-        required = zip(required, args)
+        required = list(zip(required, args))
         args = args[len(required):]
 
         # Now we'll look through our defaults, if there are any
         defaulted = [(name, default) for name, default in self._defaults
             if name not in kwargs]
-        overridden = zip([d[0] for d in defaulted], args)
+        overridden = list(zip([d[0] for d in defaulted], args))
         args = args[len(overridden):]
         defaulted = defaulted[len(overridden):]
 

@@ -10,7 +10,11 @@ import os
 from path import path
 import shovel
 import sys
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:  # pragma: no cover
+    # Python 3 support
+    from io import StringIO
 
 
 @contextmanager

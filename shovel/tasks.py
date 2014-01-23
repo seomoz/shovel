@@ -244,7 +244,10 @@ class Task(object):
         return value. Also, the traceback from the exception if there was
         one'''
         import traceback
-        from StringIO import StringIO
+        try:
+            from StringIO import StringIO
+        except ImportError:
+            from io import StringIO
         stdout, stderr = sys.stdout, sys.stderr
         sys.stdout = out = StringIO()
         sys.stderr = err = StringIO()
