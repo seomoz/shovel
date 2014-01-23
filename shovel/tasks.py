@@ -123,7 +123,7 @@ class Shovel(object):
                 keys.extend([key + '.' + k for k in value.keys()])
             else:
                 keys.append(key)
-        return keys
+        return sorted(keys)
 
     def items(self):
         '''Return a list of tuples of all the keys and tasks'''
@@ -133,7 +133,7 @@ class Shovel(object):
                 pairs.extend([(key + '.' + k, v) for k, v in value.items()])
             else:
                 pairs.append((key, value))
-        return pairs
+        return sorted(pairs)
 
     def tasks(self, name):
         '''Get all the tasks that match a name'''
