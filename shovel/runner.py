@@ -22,7 +22,7 @@
 from __future__ import print_function
 
 import logging
-from .tasks import Shovel
+from .tasks import Shovel, Task
 from .parser import parse
 from . import help, logger
 
@@ -59,6 +59,10 @@ def run(*args):
 
     # Import all of the files we want
     shovel = Shovel()
+
+    # Read in any tasks that have already been defined
+    shovel.extend(Task.clear())
+
     for path in [
         os.path.expanduser('~/.shovel.py'),
         os.path.expanduser('~/.shovel')]:

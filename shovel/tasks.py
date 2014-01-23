@@ -80,7 +80,8 @@ class Shovel(object):
 
     def read(self, path, base=None):
         '''Import some tasks'''
-        base = base or os.getcwd()
+        if base == None:
+            base = os.getcwd()
         absolute = os.path.abspath(path)
         if os.path.isfile(absolute):
             # Load that particular file
@@ -193,6 +194,11 @@ class Task(object):
                 ('shovel', '.shovel', '__init__', '.', '..', '')]
             task.fullname = '.'.join(parts)
             logger.debug('Found task %s in %s' % (task.fullname, task.module))
+        return cls.clear()
+
+    @classmethod
+    def clear(cls):
+        '''Clear and return the cache'''
         cached = cls._cache
         cls._cache = []
         return cached
