@@ -18,10 +18,10 @@ class TestHelp(unittest.TestCase):
     def test_heirarchical_helper(self):
         '''Gets all the help tuples we'd expect'''
         expected = [
-            ('two', None, 0),
-            ('two.widget', 'long doc, ' * 7, 1),
             ('one', None, 0),
-            ('one.widget', 'A dummy function', 1)]
+            ('one.widget', 'A dummy function', 1),
+            ('two', None, 0),
+            ('two.widget', 'long doc, ' * 7, 1)]
         self.assertEqual(help.heirarchical_helper(self.shovel, ''), expected)
 
     def test_heirarchical_help(self):
@@ -29,10 +29,10 @@ class TestHelp(unittest.TestCase):
         actual = [line.strip() for line in
             help.heirarchical_help(self.shovel, '').split('\n')]
         expected = [
-            'two/',
-            'two.widget => long doc, long doc, long doc, long doc, long do...',
             'one/',
-            'one.widget => A dummy function']
+            'one.widget => A dummy function',
+            'two/',
+            'two.widget => long doc, long doc, long doc, long doc, long do...']
         self.assertEqual(actual, expected)
 
     def test_shovel_help_basic(self):
@@ -40,10 +40,10 @@ class TestHelp(unittest.TestCase):
         actual = [line.strip() for line in
             help.shovel_help(self.shovel).split('\n')]
         expected = [
-            'two/',
-            'two.widget => long doc, long doc, long doc, long doc, long do...',
             'one/',
-            'one.widget => A dummy function']
+            'one.widget => A dummy function',
+            'two/',
+            'two.widget => long doc, long doc, long doc, long doc, long do...']
         self.assertEqual(actual, expected)
 
     def test_shovel_help_specific_tasks(self):

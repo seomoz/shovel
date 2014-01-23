@@ -30,7 +30,7 @@ def heirarchical_helper(shovel, prefix, level=0):
     '''Return a list of tuples of (fullname, docstring, level) for all the
     tasks in the provided shovel'''
     result = []
-    for key, value in shovel.map.items():
+    for key, value in sorted(shovel.map.items()):
         if prefix:
             key = prefix + '.' + key
         if isinstance(value, Shovel):

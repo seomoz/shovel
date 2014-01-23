@@ -1,3 +1,6 @@
+build:
+	python setup.py build
+
 clean:
 	# Remove the build
 	sudo rm -rf build dist
@@ -6,14 +9,10 @@ clean:
 	# And lastly, .coverage files
 	find . -name .coverage | xargs rm
 
-nose:
+.PHONY: test
+test:
 	rm -rf .coverage
 	nosetests --exe --cover-package=shovel --with-coverage --cover-branches -v
-
-test: nose
-
-build:
-	python setup.py build
 
 install: build
 	python setup.py install
