@@ -76,6 +76,28 @@ def run(*args):
     # If it's help we're looking for, look no further
     if clargs.method == 'help':
         print(help.shovel_help(shovel, *args, **kwargs))
+    elif clargs.method == 'tasks':
+        tasks = list(v for _, v in shovel.items())
+        if not tasks:
+            print('No tasks found!')
+        else:
+            names = list(t.fullname for t in tasks)
+            docs = list(t.doc for t in tasks)
+
+            # The width of the screen
+            width = 80
+            import shutil
+            try:
+                width, _ = shutil.get_terminal_size(fallback=(0, width))
+            except AttributeError:
+                pass
+
+            # Create the format with padding for the longest name, and to
+            # accomodate the screen width
+            format = '%%-%is # %%-%is' % (
+                max(len(name) for name in names), width)
+            for name, doc in zip(names, docs):
+                print(format % (name, doc))
     elif clargs.method:
         # Try to get the first command provided
         try:

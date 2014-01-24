@@ -88,9 +88,7 @@ make tasks globally available.
 Command Line Utility
 --------------------
 Invoke shovel with the `shovel` command. If you would like to know more about
-what functions that shovel knows about:
-
-	shovel help
+what functions that shovel knows about, ask `shovel help` or `shovel tasks`.
 
 If you'd like more information on a specific task or module, you can ask for
 more information with shovel help. Shovel can figure out lots of things about
@@ -148,6 +146,12 @@ their own repos for clarity and modularity:
 much updating will need to be done to those projects, but they can now be
 developed independently.
 
+Command Line Auto-Complete
+==========================
+Because typing is no fun, the `completions/` directory has information on how
+to set up auto-completion with different shells (currently only `zsh`). Thanks
+to `philadams` for starting this set of helpers!
+
 Motivation
 ==========
 
@@ -171,8 +175,3 @@ So now, without any additional work, you can start up the `shovel-server` and
 have access to all of the tasks you've been using from the command line. In
 this way, as developers we can keep one machine up to date and ready to run
 code, and still provide access to staff outside of the project.
-
-To-Do
-=====
-
-1. Allow the `shovel-server` utility to return `application/json` when requested

@@ -98,3 +98,16 @@ class TestRun(unittest.TestCase):
             'test/examples/run/basic', 'bar', '--dry-run')
         expected = ['Would have executed:', 'bar']
         self.assertEqual(actual, expected)
+
+    def test_tasks(self):
+        '''Make sure we can enumerate tasks'''
+        actual = self.stdout(
+            'test/examples/run/basic', 'tasks')
+        expected = ['bar # Dummy function']
+        self.assertEqual(actual, expected)
+
+    def test_tasks_none_found(self):
+        '''Display the correct thing when no tasks are found'''
+        actual = self.stdout('test/examples/run/none', 'tasks')
+        expected = ['No tasks found!']
+        self.assertEqual(actual, expected)
