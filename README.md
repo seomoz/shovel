@@ -148,14 +148,9 @@ developed independently.
 
 Command Line Auto-Complete
 ==========================
-Available for zsh.
-
-1. Tell zsh where to find the script `_shovel`. For example, put it at
-   `~/.zsh/completion/_shovel` and somewhere in .zshrc before you call
-   `compinit` add the commond `fpath=(~/.zsh/completion/ $fpath)`.
-2. Navigate to a directory where you've tasks in `shovel.py` or under
-   `shovel/`, and hit `TAB` twice. Or, type the first couple letters of a
-   command and hit `TAB` once. Boom.
+Because typing is no fun, the `completions/` directory has information on how
+to set up auto-completion with different shells (currently only `zsh`). Thanks
+to `philadams` for starting this set of helpers!
 
 Motivation
 ==========
