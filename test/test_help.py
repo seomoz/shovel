@@ -71,6 +71,14 @@ class TestHelp(unittest.TestCase):
             'widget()']
         self.assertEqual(actual, expected)
 
+    def test_help_missing_docstring(self):
+        '''We should print '(No docstring)' for tasks missing a docstring'''
+        shovel = Shovel.load(
+            'test/examples/docstring/', 'test/examples/docstring/')
+        actual = [line.strip() for line in help.shovel_help(shovel).split('\n')]
+        expected = ['one/', 'one.foo => (No docstring)']
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

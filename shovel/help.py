@@ -37,7 +37,7 @@ def heirarchical_helper(shovel, prefix, level=0):
             result.append((key, None, level))
             result.extend(heirarchical_helper(value, key, level + 1))
         else:
-            result.append((key, value.doc, level))
+            result.append((key, value.doc or '(No docstring)', level))
     return result
 
 
@@ -52,7 +52,7 @@ def heirarchical_help(shovel, prefix):
     longest = max(len(name + '    ' * level) for name, _, level in tuples)
     fmt = '%%%is => %%-50s' % longest
     for name, docstring, level in tuples:
-        if not docstring:
+        if docstring == None:
             result.append('    ' * level + name + '/')
         else:
             docstring = re.sub(r'\s+', ' ', docstring).strip()
