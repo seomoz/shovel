@@ -6,3 +6,5 @@ shovel.egg-info/*
 */shovel/*
 .coverage
 */.shovel_tasks
+virtualenv/
+*.egg

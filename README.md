@@ -175,3 +175,20 @@ So now, without any additional work, you can start up the `shovel-server` and
 have access to all of the tasks you've been using from the command line. In
 this way, as developers we can keep one machine up to date and ready to run
 code, and still provide access to staff outside of the project.
+
+Contributing
+============
+Pull requests and bug reports are welcome. For bugs, please check that the
+issue exists on the `master` branch before submitting a bug. Also, please
+include an example along with the current behavior and the expected behavior.
+Bonus points for adding a failing test.
+
+For pull requests, you'll need to add or change tests in support of your
+proposed change. To run the tests:
+
+```python
+python setup.py nosetests
+```
+
+This installs all the packages required to run tests, runs the tests and
+provides coverage information.
