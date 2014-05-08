@@ -5,6 +5,7 @@
 import unittest
 
 import os
+from path import path
 from shovel import help
 from shovel.tasks import Shovel
 
@@ -60,13 +61,14 @@ class TestHelp(unittest.TestCase):
             help.shovel_help(self.shovel, 'two.widget').split('\n')]
         # We need to replace absolute paths in the test
         actual = [line.replace(os.getcwd(), '') for line in actual]
+        expected_path = path('/test/examples/help/two.py').normpath()
         expected = [
             '==================================================',
             'widget',
             '==============================',
             ('long doc, ' * 7).strip(),
             '==============================',
-            'From /test/examples/help/two.py on line 6',
+            'From ' + expected_path  + ' on line 6',
             '==============================',
             'widget()']
         self.assertEqual(actual, expected)

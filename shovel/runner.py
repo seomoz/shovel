@@ -34,7 +34,7 @@ def run(*args):
     import argparse
     import pkg_resources
     # First off, read the arguments
-    parser = argparse.ArgumentParser(description='Rake, for Python')
+    parser = argparse.ArgumentParser(prog='shovel', description='Rake, for Python')
 
     parser.add_argument('method', help='The task to run')
     parser.add_argument('--verbose', dest='verbose', action='store_true',
