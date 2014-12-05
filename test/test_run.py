@@ -77,8 +77,9 @@ class TestRun(unittest.TestCase):
         actual = self.logs('test/examples/run/basic', 'bar', '--verbose')
         # We have to replace absolue paths with relative ones
         actual = [line.replace(os.getcwd(), '') for line in actual]
+        expected_path = path('/test/examples/run/basic/shovel.py').normpath()
         expected = [
-            'Loading /test/examples/run/basic/shovel.py',
+            'Loading ' + expected_path,
             'Found task bar in shovel']
         self.assertEqual(actual, expected)
 
