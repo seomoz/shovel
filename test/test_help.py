@@ -5,9 +5,13 @@
 import unittest
 
 import os
-from path import path
 from shovel import help
 from shovel.tasks import Shovel
+try:
+    from path import Path
+except ImportError:  # pragma: no cover
+    # Pre-6.2 path.py support
+    from path import path as Path
 
 
 class TestHelp(unittest.TestCase):
@@ -61,7 +65,7 @@ class TestHelp(unittest.TestCase):
             help.shovel_help(self.shovel, 'two.widget').split('\n')]
         # We need to replace absolute paths in the test
         actual = [line.replace(os.getcwd(), '') for line in actual]
-        expected_path = path('/test/examples/help/two.py').normpath()
+        expected_path = Path('/test/examples/help/two.py').normpath()
         expected = [
             '==================================================',
             'widget',
