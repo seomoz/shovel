@@ -7,7 +7,6 @@ import unittest
 from contextlib import contextmanager
 import logging
 import os
-from path import path
 import shovel
 import sys
 try:
@@ -15,6 +14,11 @@ try:
 except ImportError:  # pragma: no cover
     # Python 3 support
     from io import StringIO
+try:
+    from path import Path
+except ImportError:  # pragma: no cover
+    # Pre-6.2 path.py support
+    from path import path as Path
 
 
 @contextmanager
@@ -38,21 +42,21 @@ def logs():
 class TestRun(unittest.TestCase):
     '''Test our `run` method'''
     def stdout(self, pth, *args, **kwargs):
-        with path(pth):
+        with Path(pth):
             with capture() as out:
                 shovel.run(*args, **kwargs)
             return [line.strip() for line in
                 out.getvalue().strip().split('\n')]
 
     def stderr(self, pth, *args, **kwargs):
-        with path(pth):
+        with Path(pth):
             with capture('stderr') as out:
                 shovel.run(*args, **kwargs)
             return [line.strip() for line in
                 out.getvalue().strip().split('\n')]
 
     def logs(self, pth, *args, **kwargs):
-        with path(pth):
+        with Path(pth):
             with logs() as out:
                 shovel.run(*args, **kwargs)
             return [line.strip() for line in
@@ -77,7 +81,7 @@ class TestRun(unittest.TestCase):
         actual = self.logs('test/examples/run/basic', 'bar', '--verbose')
         # We have to replace absolue paths with relative ones
         actual = [line.replace(os.getcwd(), '') for line in actual]
-        expected_path = path('/test/examples/run/basic/shovel.py').normpath()
+        expected_path = Path('/test/examples/run/basic/shovel.py').normpath()
         expected = [
             'Loading ' + expected_path,
             'Found task bar in shovel']
