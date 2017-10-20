@@ -1,6 +1,11 @@
 Shovel
 ======
-[![Build Status](https://travis-ci.org/seomoz/shovel.png?branch=travis)](https://travis-ci.org/seomoz/shovel)
+[![Build Status](https://travis-ci.org/seomoz/shovel.png?branch=master)](https://travis-ci.org/seomoz/shovel)
+![Status: Production](https://img.shields.io/badge/status-production-green.svg?style=flat)
+![Team: Big Data](https://img.shields.io/badge/team-big_data-green.svg?style=flat)
+![Scope: External](https://img.shields.io/badge/scope-external-green.svg?style=flat)
+![Open Source: MIT](https://img.shields.io/badge/open_source-MIT-green.svg?style=flat)
+![Critical: Yes](https://img.shields.io/badge/critical-yes-red.svg?style=flat)
 
 Shovel is like Rake for python. Turn python functions into tasks simply, and 
 access and invoke them from the command line. 'Nuff said. __New__ Shovel also
