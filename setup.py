@@ -15,10 +15,9 @@ except ImportError:
     if sys.version_info < (2, 7):
         extra['dependencies'] = ['argparse']
 
-
 setup(
     name='shovel',
-    version='0.3.0',
+    version='0.4.0',
     description='Not Rake, but Shovel',
     long_description='Execute python functions as tasks',
     url='http://github.com/seomoz/shovel',
