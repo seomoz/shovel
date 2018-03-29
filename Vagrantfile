@@ -2,9 +2,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
 # http://docs.vagrantup.com/v2/
 Vagrant.configure('2') do |config|
-  config.vm.box = 'precise64'
+  config.vm.box = 'ubuntu/trusty64'
   config.vm.hostname = 'shovel'
   config.ssh.forward_agent = true
 

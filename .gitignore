@@ -1,10 +1,11 @@
-build/*
-dist/*
-shovel.egg-info/*
+.coverage
+.vagrant/
+build/
+dist/
+shovel.egg-info/
+venv
 *.pyc
 *shovel.py
 */shovel/*
-.coverage
 */.shovel_tasks
-virtualenv/
 *.egg

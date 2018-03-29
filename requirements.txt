@@ -1,3 +1,3 @@
-path.py==5.0
+coverage==4.5.1
 nose==1.3.0
-coverage
+path.py==11.0
