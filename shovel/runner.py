@@ -69,6 +69,10 @@ def run(*args):
         if os.path.exists(path):  # pragma: no cover
             shovel.read(path, os.path.expanduser('~/'))
 
+    shovel_home = os.environ.get('SHOVEL_HOME')
+    if shovel_home and os.path.exists(shovel_home):
+        shovel.read(shovel_home, shovel_home)
+
     for path in ['shovel.py', 'shovel']:
         if os.path.exists(path):
             shovel.read(path)

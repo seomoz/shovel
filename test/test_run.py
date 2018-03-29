@@ -116,3 +116,11 @@ class TestRun(unittest.TestCase):
         actual = self.stdout('test/examples/run/none', 'tasks')
         expected = ['No tasks found!']
         self.assertEqual(actual, expected)
+
+    def test_shovel_home(self):
+        '''Look for tasks in $SHOVEL_HOME'''
+        os.environ['SHOVEL_HOME'] = '%s/test/examples/home/shovel' % os.getcwd()
+        actual = self.stdout('test/examples/empty', 'home')
+        expected = ['SHOVEL_HOME works']
+        self.assertEqual(actual, expected)
+        del os.environ['SHOVEL_HOME']
