@@ -9,11 +9,9 @@ import logging
 import os
 import shovel
 import sys
-try:
-    from cStringIO import StringIO
-except ImportError:  # pragma: no cover
-    # Python 3 support
-    from io import StringIO
+
+from io import StringIO
+
 try:
     from path import Path
 except ImportError:  # pragma: no cover

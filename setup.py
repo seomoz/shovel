@@ -2,22 +2,11 @@
 
 import sys
 
-extra = {}
-
-try:
-    from setuptools import setup
-    if sys.version_info < (2, 7):
-        extra['install_requires'] = ['argparse']
-    if sys.version_info >= (3,):
-        extra['use_2to3'] = True
-except ImportError:
-    from distutils.core import setup
-    if sys.version_info < (2, 7):
-        extra['dependencies'] = ['argparse']
+from setuptools import setup
 
 setup(
     name='shovel',
-    version='0.4.0',
+    version='0.5.0',
     description='Not Rake, but Shovel',
     long_description='Execute python functions as tasks',
     url='http://github.com/seomoz/shovel',
@@ -32,7 +21,7 @@ setup(
     # scripts=['bin/shovel'],
     entry_points={'console_scripts': ['shovel = shovel:run']},
     setup_requires=['nose>=1.3'],
-    test_suite='nose.collector',
+    test_suite='nose2.collector.collector',
     tests_require=['nose>=1.3', 'path.py>=5.0', 'coverage>=3.7'],
     classifiers=[
         'License :: OSI Approved :: MIT License',
@@ -40,5 +29,4 @@ setup(
         'Intended Audience :: Developers',
         'Operating System :: OS Independent'
     ],
-    **extra
 )
