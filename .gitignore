@@ -8,4 +8,4 @@ venv
 *shovel.py
 */shovel/*
 */.shovel_tasks
-*.egg
+*.eggs

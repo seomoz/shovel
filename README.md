@@ -192,7 +192,7 @@ For pull requests, you'll need to add or change tests in support of your
 proposed change. To run the tests:
 
 ```python
-python setup.py nosetests
+nose2 -v
 ```
 
 This installs all the packages required to run tests, runs the tests and
