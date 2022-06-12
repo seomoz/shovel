@@ -21,6 +21,7 @@
 
 from __future__ import print_function
 
+import re
 import logging
 from .tasks import Shovel, Task
 from .parser import parse
@@ -86,7 +87,7 @@ def run(*args):
             print('No tasks found!')
         else:
             names = list(t.fullname for t in tasks)
-            docs = list(t.doc for t in tasks)
+            docs = list(re.sub(r'\s+', ' ', t.doc) for t in tasks)
 
             # The width of the screen
             width = 80
@@ -98,8 +99,8 @@ def run(*args):
 
             # Create the format with padding for the longest name, and to
             # accomodate the screen width
-            format = '%%-%is # %%-%is' % (
-                max(len(name) for name in names), width)
+            namemax = max(len(name) for name in names)
+            format = '%%-%is => %%.%is...' % (namemax, width - namemax - 8)
             for name, doc in zip(names, docs):
                 print(format % (name, doc))
     elif clargs.method:
